@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<!--Name
+    Class: CSC3360
+    Project: Bouncing Circle Game
+    Note: See animate.js for game description and controls
+-->
+
+
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+      <title>Animate 2 circles</title>
+ 
+      <style>
+         canvas {
+             border: 1px solid black;
+         }
+      </style> 
+      <script id="vertex-shader" type="x-shader/x-vertex">
+      
+      precision mediump float;
+      
+      //vertices that make the points on the unit circle
+      //attributes are tied to array buffers
+      attribute vec2 aCirclePts;  
+
+      //projection view matrix
+      uniform mat4 uProjMat;  
+
+      //how much to scale the circle
+      uniform float uCircleSize;  
+
+      //position of the circle
+      uniform vec2 uCirclePos; 
+
+      uniform vec4 uCircleColor; 
+      //the uniform variables will be filled as the program runs
+
+      varying vec4 vColor;
+
+      void main()
+      {
+	 vColor = uCircleColor;
+
+         //these have to be in column major order. why?
+         mat4 S = mat4(uCircleSize, 0.0,         0.0, 0.0, //this is the scaling matrix
+                       0.0,         uCircleSize, 0.0, 0.0,
+                       0.0,         0.0,         1.0, 0.0,
+                       0.0,         0.0,         0.0, 1.0);
+
+         mat4 T = mat4(1.0,          0.0,          0.0, 0.0, //this is the translate matrix
+                       0.0,          1.0,          0.0, 0.0,
+                       0.0,          0.0,          1.0, 0.0,
+                       uCirclePos.x, uCirclePos.y, 0.0, 1.0);
+
+         gl_Position =  uProjMat * T * S * vec4(aCirclePts,0.0,1.0); //converting vec2 to vec4 homogeneous coords
+      }
+      /* another way to accomplish the same thing,
+         set up a modelView matrix which is identity*T*S in the CPU then
+         feed it into mv as defined on the next line.
+      
+         uniform mat4 mv;    //model view matrix
+      
+         Then changed the statmenet gl_Position =  p * T * S * vPosition;
+         becomes gl_Position =  p * mv * vPosition;
+      */
+      
+      </script>
+      
+      <script id="fragment-shader" type="x-shader/x-fragment">
+      
+      precision mediump float;
+      varying vec4 vColor;
+
+      void main()
+      {
+          gl_FragColor = vColor; 
+      }
+      
+      </script>
+      
+      <script type="text/javascript" src="../../common/MV.js"></script>
+      <script type="text/javascript" src="../../common/initShaders.js"></script>
+      <script type="text/javascript" src="animate.js"></script>
+   </head>
+   
+   <body>
+      <canvas id="gl-canvas" width="512" height="512">
+         Oops ... your browser doesn't support the HTML5 canvas element
+      </canvas>
+      <p>
+      <canvas id="level-canvas" width = "512" height="100"
+	      style type="text/css">
+
+	 <script type="text/javascript">
+            document.getElementById("level-canvas").style.border = "none";
+	 </script>
+	    
+      </canvas>
+
+      <script type="text/javascript">
+      	
+	 initiateScript();
+
+      </script>
+     
+   </body>
+</html>
+
